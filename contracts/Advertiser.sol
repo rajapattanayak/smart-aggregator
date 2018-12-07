@@ -31,7 +31,7 @@ contract Advertiser {
     address[] deployedOffers;
 
     modifier restricted() {
-        require(msg.sender==owner, "You need to have advertiser owner credential for this operation");
+        require(msg.sender == owner, "You need to have advertiser owner credential for this operation");
         _;
     }
     constructor(string _profileHash, address _owner) public {
@@ -62,9 +62,27 @@ contract Offer {
     address advertiserContract;
     address advertiserowner;
 
+    modifier restricted() {
+        require(msg.sender == advertiserowner, "You need to have advertiser owner credential for this operation");
+        _;
+    }
+
     constructor(string _offerProfileHash, address _advertiserContract, address _advertiserowner) public {
         offerProfileHash = _offerProfileHash;
         advertiserContract = _advertiserContract;
         advertiserowner = _advertiserowner;
     }
+
+    function getProfile() public view returns(string, address, address) {
+        return(
+            offerProfileHash,
+            advertiserContract,
+            advertiserowner
+        );
+    }
+
+    function updateProfile(string _offerProfileHash) public restricted {
+        offerProfileHash = _offerProfileHash;
+    }
+
 }
