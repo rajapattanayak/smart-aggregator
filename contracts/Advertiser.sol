@@ -28,6 +28,7 @@ contract AdvertiserFactory {
 contract Advertiser {
     address owner;
     string profileHash;
+    address[] deployedOffers;
 
     modifier restricted() {
         require(msg.sender==owner, "You need to have advertiser owner credential for this operation");
@@ -43,5 +44,27 @@ contract Advertiser {
            profileHash,
            owner 
         );
+    }
+
+    function updateProfile(string _profileHash) public restricted {
+        profileHash = _profileHash;
+    }
+
+    function createOffer(string _offerProfileHash) public restricted {
+        address offer = new Offer(_offerProfileHash, address(this), msg.sender);
+        deployedOffers.push(offer);
+    }
+
+}
+
+contract Offer {
+    string offerProfileHash;
+    address advertiserContract;
+    address advertiserowner;
+
+    constructor(string _offerProfileHash, address _advertiserContract, address _advertiserowner) public {
+        offerProfileHash = _offerProfileHash;
+        advertiserContract = _advertiserContract;
+        advertiserowner = _advertiserowner;
     }
 }
