@@ -54,7 +54,7 @@ class Publisher extends Component {
       const publisherProfile = await publisherInstance.getProfile({
         from: accounts[0]
       });
-      const profileHash = publisherProfile[0];
+      const profileHash = publisherProfile;
       this.setState({ publisherProfileHash: profileHash });
 
       const ipfsHash = await ipfs.dag.get(this.state.publisherProfileHash);
