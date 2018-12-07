@@ -55,6 +55,10 @@ contract Advertiser {
         deployedOffers.push(offer);
     }
 
+    function getDeployedOffers() public view returns(address[]) {
+        return deployedOffers;
+    }
+
 }
 
 contract Offer {
