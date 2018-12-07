@@ -28,7 +28,10 @@ class Advertiser extends Component {
     offerName: "",
     offerTargetUrl: "",
     offerProfileHash: "",
-    offersList: []
+    offersList: [],
+    offerContractAddress: "",
+    publisherOfferContractAddress:"",
+    clickid:""
   };
 
   componentDidMount = async () => {
@@ -206,6 +209,11 @@ class Advertiser extends Component {
     }
   };
 
+  updateProfile = async event => {
+    console.log('Update Profile');
+    //todo
+  }
+
   createOffer = async event => {
     event.preventDefault();
 
@@ -267,6 +275,50 @@ class Advertiser extends Component {
       />
     );
   };
+
+  registerConversion = async (event) => {
+    window.scrollTo(0,0);
+    event.preventDefault();
+    
+    const { accounts, web3 } = this.state;
+
+    if (!this.state.offerContractAddress) return;
+    if (!this.state.publisherOfferContractAddress) return;
+    if (!this.state.clickid) return;
+
+    try {
+      this.setState({message: "Creating Test Converstion"});
+      
+      const offerContract = truffleContract(
+        OfferContract
+      );
+
+      offerContract.setProvider(web3.currentProvider);
+      const offerInstance = await offerContract.at(
+        this.state.offerContractAddress
+      );
+
+      let conversionid = parseInt(
+        (new Date().getTime() / 1000).toFixed(0),
+        0
+      ).toString();
+      const conversionData = "100$-Sale-1$-Cashback";
+
+      await offerInstance.registerConversion(
+        this.state.publisherOfferContractAddress,
+        this.state.clickid,
+        conversionid,
+        conversionData,
+        {
+          from : accounts[0]
+        }
+      );
+
+      this.showAdvertiserHome();
+    } catch(error) {
+      console.log(error)
+    }
+  }
 
   render() {
     if (!this.state.web3) {
@@ -435,6 +487,64 @@ class Advertiser extends Component {
         <br />
         <br />
         <hr />
+
+        <div>
+          <h2> Create Conversion (Test) </h2>
+          <form
+            className="pure-form pure-form-aligned"
+            onSubmit={this.registerConversion}
+          >
+            <fieldset>
+              <div className="pure-control-group">
+                <label htmlFor="offercontractaddr">
+                  Offer Contract Address
+                </label>
+                <input
+                  id="offercontractaddr"
+                  type="text"
+                  value={this.state.offerContractAddress}
+                  onChange={event =>
+                    this.setState({ offerContractAddress: event.target.value })
+                  }
+                />
+              </div>
+
+              <div className="pure-control-group">
+                <label htmlFor="publisheroffercontractaddr">
+                  Publisher Offer Contract Address
+                </label>
+                <input
+                  id="publisheroffercontractaddr"
+                  type="text"
+                  value={this.state.publisherOfferContractAddress}
+                  onChange={event =>
+                    this.setState({ publisherOfferContractAddress: event.target.value })
+                  }
+                />
+              </div>
+
+              <div className="pure-control-group">
+                <label htmlFor="clickid">Click Id</label>
+                <input
+                  id="clickid"
+                  type="text"
+                  placeholder="Click Id"
+                  value={this.state.clickid}
+                  onChange={event =>
+                    this.setState({ clickid: event.target.value })
+                  }
+                />
+              </div>
+
+              <div className="pure-control-group">
+                <input type="submit" />
+              </div>
+            </fieldset>
+          </form>
+        </div>
+
+        <br />
+        <br />
         
         <p>You are using {this.state.accounts[0]} account</p>
       </div>
