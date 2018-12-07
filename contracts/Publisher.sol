@@ -117,10 +117,19 @@ contract PublisherOffer {
         return clicks.length;
     }
 
-    function registerConversion(string _clickId, string _conversionId, string _conversionData) public {
+    function registerConversion(
+        string _clickId, 
+        string _conversionId, 
+        string _conversionData) 
+        public 
+    {
         require(msg.sender == advertiserOfferContract, "You do not have permission to perform this action!");
 
-        Conversion memory newConversion = Conversion({ clickId : _clickId, conversionId : _conversionId, conversionData : _conversionData });
+        Conversion memory newConversion = Conversion({ 
+            clickId : _clickId,
+            conversionId : _conversionId,
+            conversionData : _conversionData 
+        });
         conversions.push(newConversion);
     }
 
