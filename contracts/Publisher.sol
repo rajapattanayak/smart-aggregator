@@ -28,7 +28,6 @@ contract PublisherFactory {
 contract Publisher {
     address owner;
     string profileHash;
-
     address[] deployedPublisherOffers;
 
     constructor(string _profileHash, address _owner) public {
@@ -67,27 +66,6 @@ contract PublisherOffer {
     address public publisherOwner;
     address public publisherContract;
     address public advertiserOfferContract;
-
-    constructor(string _publisherOfferHash, address _publisherOwner, address _publisherContract, address _advertiserOfferContract) public {
-        publisherOfferHash = _publisherOfferHash;
-        publisherOwner = _publisherOwner;
-        publisherContract = _publisherContract;
-        advertiserOfferContract = _advertiserOfferContract;
-    }
-
-    modifier restricted() {
-        require(msg.sender == publisherOwner, "You are not autorized to perform this actions");
-        _;
-    }
-
-    function updatePublisherOffer(string _publisherOfferHash) public restricted {
-        publisherOfferHash = _publisherOfferHash;
-    }
-
-    function getPublisherOffer() public view returns(string, address, address, address) {
-        return(publisherOfferHash, publisherContract, publisherOwner, advertiserOfferContract);
-    }
-
     struct Click {
         uint256 userId;
         string clickId;
@@ -99,8 +77,29 @@ contract PublisherOffer {
         string conversionId;
         string conversionData;
     }
-    Converstion[] conversions;
+    Conversion[] conversions;
 
+    modifier restricted() {
+        require(msg.sender == publisherOwner, "You are not autorized to perform this actions");
+        _;
+    }
+
+    constructor(string _publisherOfferHash, address _publisherOwner, address _publisherContract, address _advertiserOfferContract) public {
+        publisherOfferHash = _publisherOfferHash;
+        publisherOwner = _publisherOwner;
+        publisherContract = _publisherContract;
+        advertiserOfferContract = _advertiserOfferContract;
+    }
+
+    function updatePublisherOffer(string _publisherOfferHash) public restricted {
+        publisherOfferHash = _publisherOfferHash;
+    }
+
+    function getPublisherOffer() public view returns(string, address, address, address) {
+        return(publisherOfferHash, publisherContract, publisherOwner, advertiserOfferContract);
+    }
+
+   
     function registerClick(uint256 _userId, string _clickId) public restricted {
         Click memory newClick = Click({ userId : _userId, clickId: _clickId});
         clicks.push(newClick);
@@ -134,6 +133,6 @@ contract PublisherOffer {
 
         Conversion storage conversion = conversions[index];
 
-        return (conversion.clickId, coversion.conversionId, conversion.conversionData);
+        return (conversion.clickId, conversion.conversionId, conversion.conversionData);
     }
 }

@@ -1,5 +1,7 @@
 pragma solidity ^0.4.24;
 
+import "./Publisher.sol";
+
 contract AdvertiserFactory {
     address[] deployedAdvertisers;
     mapping(address => address) advertisers; //owner to advertiser
@@ -65,6 +67,13 @@ contract Offer {
     string offerProfileHash;
     address advertiserContract;
     address advertiserowner;
+    struct Conversion {
+        string clickId;
+        string conversionId;
+        string conversionData;
+        address publisherOfferContractAddress;
+    }
+    Conversion[] conversions;
 
     modifier restricted() {
         require(msg.sender == advertiserowner, "You need to have advertiser owner credential for this operation");
@@ -89,31 +98,26 @@ contract Offer {
         offerProfileHash = _offerProfileHash;
     }
 
-    struct Conversion {
-        string clickId;
-        string conversionId;
-        string conversionData;
-        address publisherOfferContractAddress;
-    }
-    Conversion[] conversions;
-
     function registerConversion(
         address _publishedOfferContractAddress,
         string _clickId,
         string _conversionId,
-        string _conversionData) public restricted {
-            require(_publishedOfferContractAddress != Address(0), "Publisher Offer Contract Address is not found!");
+        string _conversionData) 
+        public restricted 
+    {
+        require(_publishedOfferContractAddress != address(0), "Publisher Offer Contract Address is not found!");
 
-            Conversion memory newConversion = Conversion({
-                clickId : _clickId,
-                conversionId : _conversionId,
-                conversionData : _conversionData,
-                publisherOfferContractAddress : _publishedOfferContractAddress
-            });
-            conversions.push(newConversion);
+        Conversion memory newConversion = Conversion({
+            clickId : _clickId,
+            conversionId : _conversionId,
+            conversionData : _conversionData,
+            publisherOfferContractAddress : _publishedOfferContractAddress
+        });
 
-            PublisherOffer publisherOffer = PublisherOffer(_publisherOfferContractAddress);
-            publisherOffer.registerConversion(_clickId, _conversionId, _conversionData);
+        conversions.push(newConversion);
+
+        PublisherOffer publisherOffer = PublisherOffer(_publishedOfferContractAddress);
+        publisherOffer.registerConversion(_clickId, _conversionId, _conversionData);
     }
 
     function getConversionsCount() public view returns(uint) {
