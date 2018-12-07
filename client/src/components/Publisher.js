@@ -6,6 +6,10 @@ import PublisherContract from "../contracts/Publisher.json";
 import PublisherFactoryContract from "../contracts/PublisherFactory.json";
 import PublisherOfferContract from "../contracts/PublisherOffer.json";
 
+import AdvertiserContract from "../contracts/Advertiser.json"
+import AdvertiserFactoryContract from "../contracts/AdvertiserFactory.json"
+import AdvertiserOfferContract from "../contracts/Offer.json"
+
 import getWeb3 from "../utils/getWeb3";
 import ipfs from "../utils/ipfs";
 
@@ -140,6 +144,41 @@ class Publisher extends Component {
       console.log(error);
     }
   }
+
+  // pullAllAdvertiserOffer = async () => {
+  //   const { advertiserFactoryInstance } = this.state;
+
+  //   try {
+  //     const advertisers = await advertiserFactoryInstance.getDeployedAdvertisers();
+
+  //     const advertiserContract = truffleContract(AdvertiserContract);
+  //     advertiserContract.setProvider(this.state.web3.currentProvider);
+
+  //     const advertiserOfferContract = truffleContract(AdvertiserOfferContract);
+  //     advertiserOfferContract.setProvider(this.state.web3.currentProvider);
+
+  //     const advertiserOfferList = [];
+  //     for (const advertiserContractAddress of advertisers) {
+  //       const advertiserInstance = await advertiserContract.at(advertiserContractAddress);
+
+  //       // Advertiser Profile
+  //       const advertiserProfile = await advertiserInstance.getAdvertiserProfile();
+  //       const advertiserProfileHash = advertiserProfile[0] || "";
+
+  //       const ipfsHash = await ipfs.dag.get(advertiserProfileHash);
+  //       const profile = ipfsHash.value;
+  //       const advertiserName = profile.advertiserName;
+
+  //       // Advertiser Offers
+  //       const advertiserOffers = await advertiserInstance.getDeployedOffers();
+
+
+  //     }
+
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
 
   render() {
     if (!this.state.web3) {
