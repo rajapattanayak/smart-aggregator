@@ -3,7 +3,7 @@ import AdvertiserFactoryContract from "../contracts/AdvertiserFactory.json";
 import getWeb3 from "../utils/getWeb3";
 import truffleContract from "truffle-contract";
 
-import "../App.css";
+import "../index.css";
 
 
 class Advertiser extends Component {
@@ -11,7 +11,8 @@ class Advertiser extends Component {
     message: "", 
     web3: null, 
     accounts: null, 
-    advertiserFactoryInstance: null
+    advertiserFactoryInstance: null,
+    isAdvertiserRegistered: false
   };
 
   componentDidMount = async () => {
@@ -49,6 +50,7 @@ class Advertiser extends Component {
       });
   
       if (isAdvertiserRegistered) {
+        this.setState({ isAdvertiserRegistered });
         // Pull Profile
         console.log('Exists !');
 
@@ -65,9 +67,12 @@ class Advertiser extends Component {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
+    if (!this.state.isAdvertiserRegistered) {
+      return <div> New Advertiser </div>
+    }
     return (
       <div className="App">
-        
+        Existing Advertiser
       </div>
     );
   }
