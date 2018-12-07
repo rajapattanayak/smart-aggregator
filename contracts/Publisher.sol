@@ -29,6 +29,8 @@ contract Publisher {
     address owner;
     string profileHash;
 
+    address[] deployedPublisherOffers;
+
     constructor(string _profileHash, address _owner) public {
         owner = _owner;
         profileHash = _profileHash;
@@ -45,6 +47,18 @@ contract Publisher {
 
     function getProfile() public view returns(string) {
         return profileHash;
+    }
+
+    function createPublisherOffer(string _publisherOfferHash, address _advertiserOfferContract) public restricted {
+        require(_advertiserOfferContract != address(0), "Advertiser Offer Contract address is not found!");
+
+        address publisherOffer = new PublisherOffer(_publisherOfferHash, address(this), msg.sender, _advertiserOfferContract);
+
+        deployedPublisherOffers.push(publisherOffer);
+    }
+
+    function getDeployedPublisherOffers() public view returns (address[]) {
+        return deployedPublisherOffers;
     }
 }
 
