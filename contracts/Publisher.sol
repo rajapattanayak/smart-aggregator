@@ -52,7 +52,7 @@ contract Publisher {
     function createPublisherOffer(string _publisherOfferHash, address _advertiserOfferContract) public restricted {
         require(_advertiserOfferContract != address(0), "Advertiser Offer Contract address is not found!");
 
-        address publisherOffer = new PublisherOffer(_publisherOfferHash, address(this), msg.sender, _advertiserOfferContract);
+        address publisherOffer = new PublisherOffer(_publisherOfferHash, msg.sender, address(this), _advertiserOfferContract);
 
         deployedPublisherOffers.push(publisherOffer);
     }
@@ -64,14 +64,14 @@ contract Publisher {
 
 contract PublisherOffer {
     string public publisherOfferHash;
-    address public advertiserOfferContract;
     address public publisherOwner;
     address public publisherContract;
+    address public advertiserOfferContract;
 
-    constructor(string _publisherOfferHash, address _publisherContract, address _publisherOwner, address _advertiserOfferContract) public {
+    constructor(string _publisherOfferHash, address _publisherOwner, address _publisherContract, address _advertiserOfferContract) public {
         publisherOfferHash = _publisherOfferHash;
-        publisherContract = _publisherContract;
         publisherOwner = _publisherOwner;
+        publisherContract = _publisherContract;
         advertiserOfferContract = _advertiserOfferContract;
     }
 
@@ -86,5 +86,54 @@ contract PublisherOffer {
 
     function getPublisherOffer() public view returns(string, address, address, address) {
         return(publisherOfferHash, publisherContract, publisherOwner, advertiserOfferContract);
+    }
+
+    struct Click {
+        uint256 userId;
+        string clickId;
+    }
+    Click[] clicks;
+
+    struct Conversion {
+        string clickId;
+        string conversionId;
+        string conversionData;
+    }
+    Converstion[] conversions;
+
+    function registerClick(uint256 _userId, string _clickId) public restricted {
+        Click memory newClick = Click({ userId : _userId, clickId: _clickId});
+        clicks.push(newClick);
+    }
+
+    function getClickByIndex(uint index) public view returns(uint256, string) {
+        require(index >= 0, "Index should be a positive value");
+
+        Click storage click = clicks[index];
+
+        return(click.userId, click.clickId);
+    }
+
+    function getClicksCount() public view returns(uint) {
+        return clicks.length;
+    }
+
+    function registerConversion(string _clickId, string _conversionId, string _conversionData) public {
+        require(msg.sender == advertiserOfferContract, "You do not have permission to perform this action!");
+
+        Conversion memory newConversion = Conversion({ clickId : _clickId, conversionId : _conversionId, conversionData : _conversionData });
+        conversions.push(newConversion);
+    }
+
+    function getConversionsCount() public view returns(uint) {
+        return conversions.length;
+    }
+
+    function getConversionByIndex(uint index) public view returns(string, string, string) {
+        require(index >= 0, "Index should be positive");
+
+        Conversion storage conversion = conversions[index];
+
+        return (conversion.clickId, coversion.conversionId, conversion.conversionData);
     }
 }
