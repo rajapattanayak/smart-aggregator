@@ -31,7 +31,8 @@ class Advertiser extends Component {
     offersList: [],
     offerContractAddress: "",
     publisherOfferContractAddress:"",
-    clickid:""
+    clickid:"",
+    conversionsByOffer: null
   };
 
   componentDidMount = async () => {
@@ -60,10 +61,50 @@ class Advertiser extends Component {
     }
   };
 
+  pullConversions = async (offerinstance) => {
+    const { accounts } = this.state;
+
+    let conversions = [];
+    let sorted_conversions =[];
+
+    try {
+      const conversionCount = await offerinstance.getConversionsCount({
+        from: accounts[0]
+      });
+
+      for (let i = 0; i < conversionCount.toNumber(); i++) {
+        const conversionInfo = await offerinstance.getConversionByIndex(i, {
+          from: accounts[0]
+        })
+
+        let conversion = {};
+        conversion.clickId = conversionInfo[0];
+        conversion.conversionId = conversionInfo[1];
+        conversion.conversionData = conversionInfo[2];
+        conversion.publisherOfferContractAddress = conversionInfo[3];
+        
+        conversions.push(conversion);
+      }
+      if (conversions && conversions.length) {
+        sorted_conversions = conversions
+          .sort((item1, item2) => {
+            return (
+              new Date(item1.clickId * 1000).getTime() -
+              new Date(item2.clickId * 1000).getTime()
+            );
+          })
+          .reverse();
+      }
+    } catch(error) {
+      console.log(error);
+    }
+    return sorted_conversions;
+  }
+
   pullOffers = async () => {
-    console.log("Pulling Offers");
     const { advertiserInstance } = this.state;
     let offersList = [];
+    let conversionsByOffer = {};
 
     try {
       const offers = await advertiserInstance.getDeployedOffers({
@@ -94,11 +135,14 @@ class Advertiser extends Component {
               offerTargetUrl,
               offerContractAddress: offerInstance.address
             });
+
+            const conversions = await this.pullConversions(offerInstance);
+            conversionsByOffer[offerInstance.address] = conversions;
           }
         }
       }
       if (offersList && offersList.length) {
-        this.setState({ offersList });
+        this.setState({ offersList, conversionsByOffer });
       }
     } catch (error) {
       console.log(error);
@@ -247,6 +291,70 @@ class Advertiser extends Component {
     }
   };
 
+  getFormattedTime = (unixtime) => {
+    return new Date(unixtime * 1000).toLocaleString();
+  }
+
+  showConversions = row => {
+    const offerContractAddress = row.original.offerContractAddress;
+    const conversions = this.state.conversionsByOffer[offerContractAddress];
+    const columns = [
+      {
+        Header: "CLICK",
+        columns: [
+          {
+            Header: "Time",
+            id: "clickTime",
+            accessor: item => this.getFormattedTime(parseInt(item.clickId, 0)),
+            minWidth: 200
+          },
+          {
+            Header: "Id",
+            accessor: "clickId",
+            minWidth: 150
+          }
+        ]
+      },
+      {
+        Header: "CONVERSION",
+        columns: [
+          {
+            Header: "Id",
+            accessor: "conversionId",
+            minWidth: 150
+          },
+          {
+            Header: "Conversion Data",
+            accessor: "conversionData"
+          }
+        ]
+      },
+      {
+        Header: "PUBLISHER OFFER",
+        columns: [
+          {
+            Header: "Contrcat Address",
+            accessor: "publisherOfferContractAddress",
+            minWidth: 400
+          }
+        ]
+      }
+    ];
+
+    return (
+      <div style={{ padding: "25px" }}>
+        <em style={{ color: "red" }}>Click And Conversion</em>
+        <br />
+        <br />
+        <ReactTable
+          data={conversions}
+          columns={columns}
+          defaultPageSize={3}
+          showPagination={false}
+        />
+      </div>
+    );
+  }
   showOfferList = () => {
     const columns = [
       {
@@ -272,6 +380,7 @@ class Advertiser extends Component {
         columns={columns}
         defaultPageSize={5}
         className="-striped -highlight"
+        SubComponent={this.showConversions}
       />
     );
   };
