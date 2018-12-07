@@ -12,3 +12,16 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.App {
+  width: 60%;
+  margin: auto
+}
+input[type="text"] {
+  width: 25%
+}
+p {
+  margin-top: 20px;
+  text-align: center;
+  color: red;
+}
