@@ -29,9 +29,19 @@ contract Advertiser {
     address owner;
     string profileHash;
 
+    modifier restricted() {
+        require(msg.sender==owner, "You need to have advertiser owner credential for this operation");
+        _;
+    }
     constructor(string _profileHash, address _owner) public {
         owner = _owner;
         profileHash = _profileHash;
     }
 
+    function getProfile() public view returns(string, address) {
+        return(
+           profileHash,
+           owner 
+        );
+    }
 }
