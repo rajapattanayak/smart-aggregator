@@ -89,4 +89,47 @@ contract Offer {
         offerProfileHash = _offerProfileHash;
     }
 
+    struct Conversion {
+        string clickId;
+        string conversionId;
+        string conversionData;
+        address publisherOfferContractAddress;
+    }
+    Conversion[] conversions;
+
+    function registerConversion(
+        address _publishedOfferContractAddress,
+        string _clickId,
+        string _conversionId,
+        string _conversionData) public restricted {
+            require(_publishedOfferContractAddress != Address(0), "Publisher Offer Contract Address is not found!");
+
+            Conversion memory newConversion = Conversion({
+                clickId : _clickId,
+                conversionId : _conversionId,
+                conversionData : _conversionData,
+                publisherOfferContractAddress : _publishedOfferContractAddress
+            });
+            conversions.push(newConversion);
+
+            PublisherOffer publisherOffer = PublisherOffer(_publisherOfferContractAddress);
+            publisherOffer.registerConversion(_clickId, _conversionId, _conversionData);
+    }
+
+    function getConversionsCount() public view returns(uint) {
+        return conversions.length;
+    }
+
+    function getConversionByIndex(uint index) public view returns(string, string, string, address) {
+        require(index >= 0, "Index should be positive");
+
+        Conversion storage conversion = conversions[index];
+
+        return (
+            conversion.clickId,
+            conversion.conversionId,
+            conversion.conversionData,
+            conversion.publisherOfferContractAddress
+        );
+    }
 }
