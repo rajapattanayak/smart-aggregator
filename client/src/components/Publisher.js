@@ -61,16 +61,16 @@ class Publisher extends Component {
 
   pullAdvertiserOffers = async () => {
     
-    const { advertiserFactoryinstance, accounts } = this.state;
+    const { advertiserFactoryinstance, accounts, web3 } = this.state;
 
     try {
       const advertisers = await advertiserFactoryinstance.getDeployedAdvertisers();
 
       const advertiserContract = truffleContract(AdvertiserContract);
-      advertiserContract.setProvider(this.state.web3.currentProvider);
+      advertiserContract.setProvider(web3.currentProvider);
 
       const advertiserOfferContract = truffleContract(AdvertiserOfferContract);
-      advertiserOfferContract.setProvider(this.state.web3.currentProvider);
+      advertiserOfferContract.setProvider(web3.currentProvider);
 
       const advertiserOfferList = [];
       for (const advertiserContractAddress of advertisers) {
@@ -118,8 +118,8 @@ class Publisher extends Component {
         }
       }
       if (advertiserOfferList && advertiserOfferList.length) {
-        console.log(advertiserOfferList);
         this.setState({ advertiserOfferList });
+        console.log(this.state.advertiserOfferList);
       }
     } catch (error) {
       console.log(error);
@@ -236,7 +236,7 @@ class Publisher extends Component {
       },
       {
         Header: "Offer Name",
-        accessor: "advertiserName",
+        accessor: "advertiserOfferName",
         minWidth: 100
       },
       {
@@ -362,10 +362,10 @@ class Publisher extends Component {
         </form>
         <br />
 
-        <div>
+        {/* <div>
           <h2>Advertiser Offer List</h2>
           {this.showAdvertiserOfferList()}
-        </div>
+        </div> */}
 
         <p>You are using {this.state.accounts[0]} account</p>
       </div>
