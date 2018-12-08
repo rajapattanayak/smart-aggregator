@@ -17,6 +17,108 @@ import ipfs from "../utils/ipfs";
 import "../index.css";
 import "../pure-min.css";
 
+class DisplayConversions extends Component {
+  state = {
+    conversions: this.props.conversions
+  };
+
+  getFormattedTime = unixtime => {
+    return new Date(unixtime * 1000).toLocaleString();
+  };
+
+  render() {
+    const columns = [
+      {
+        Header: "CLICK",
+        columns: [
+          {
+            Header: "Time",
+            id: "clickTime",
+            accessor: item => this.getFormattedTime(parseInt(item.clickId, 0)),
+            minWidth: 200
+          },
+          {
+            Header: "Id",
+            accessor: "clickId",
+            minWidth: 150
+          }
+        ]
+      },
+      {
+        Header: "CONVERSION",
+        columns: [
+          {
+            Header: "Id",
+            accessor: "conversionId",
+            minWidth: 150
+          },
+          {
+            Header: "Conversion Data",
+            accessor: "conversionData"
+          }
+        ]
+      }
+    ];
+
+    return (
+      <div style={{ padding: "25px" }}>
+        <em style={{ color: "red" }}>Conversions</em>
+        <br />
+        <br />
+        <ReactTable
+          data={this.state.conversions}
+          columns={columns}
+          defaultPageSize={5}
+          className="-striped -highlight"
+        />
+      </div>
+    );
+  };
+}
+
+class DisplayClicks extends Component {
+  state = {
+    clicks: this.props.clicks
+  };
+  
+  getFormattedTime = unixtime => {
+    return new Date(unixtime * 1000).toLocaleString();
+  };
+
+  render() {
+    const columns = [
+      {
+        Header: "Click Time",
+        id: "clickTime",
+        accessor: item => this.getFormattedTime(parseInt(item.clickid, 0))
+      },
+      {
+        Header: "Click Id",
+        accessor: "clickid"
+      },
+      {
+        Header: "User Id",
+        accessor: "userid",
+        Cell: props => <span className="number">{props.value}</span>
+      }
+    ];
+  
+    return (
+      <div style={{ padding: "25px" }}>
+        <em style={{ color: "red" }}>Clicks</em>
+        <br />
+        <br />
+        <ReactTable
+          data={this.state.clicks}
+          columns={columns}
+          defaultPageSize={5}
+          className="-striped -highlight"
+        />
+      </div>
+    );
+  }
+}
+
 class PublisherOfferRegistration extends Component {
   state = {
     advertiserOfferContract: this.props.advertiserOfferContract,
@@ -94,7 +196,9 @@ class Publisher extends Component {
     publisherWebsite: "",
     publisherProfileHash: "",
     advertiserOfferList: [],
-    publisherOfferList:[]
+    publisherOfferList: [],
+    publisherOfferContractAddress: "",
+    userid: ""
   };
 
   componentDidMount = async () => {
@@ -130,20 +234,107 @@ class Publisher extends Component {
     }
   };
 
+  pullClicks = async (publisherOfferInstance) => {
+    let clicks = [];
+    let sorted_clicks = [];
+
+    const { accounts } = this.state; 
+
+    try {
+      this.setState({ message: "Pulling Click Data" });
+      const clicksCount = await publisherOfferInstance.getClicksCount.call(
+        { from: accounts[0] }
+      );
+
+      for (let i = 0; i < clicksCount.toNumber(); i++) {
+        const clickInfo = await publisherOfferInstance.getClickByIndex.call(
+          i,
+          { from: accounts[0] }
+        );
+
+        if (clickInfo) {
+          const click = {};
+          click.userid = clickInfo[0].toNumber();
+          click.clickid = clickInfo[1];
+          clicks.push(click);
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
+
+    this.setState({ message: "" });
+
+    if (clicks && clicks.length) {
+      sorted_clicks = clicks
+        .sort((item1, item2) => {
+          return (
+            new Date(item1.clickid * 1000).getTime() -
+            new Date(item2.clickid * 1000).getTime()
+          );
+        })
+        .reverse();
+    }
+    return sorted_clicks;
+  }
+
+  pullConversions = async (publisherOfferInstance) => {
+    let conversions = [];
+    let sorted_conversions = [];
+
+    const { accounts } = this.state;
+
+    try {
+      const conversionCount = await publisherOfferInstance.getConversionsCount({
+        from: accounts[0]
+      });
+
+      for (let i = 0; i < conversionCount.toNumber(); i++) {
+        const conversionInfo = await publisherOfferInstance.getConversionByIndex(i,{
+          from: accounts[0]
+        });
+
+        if (conversionInfo) {
+          const conversion = {};
+          conversion.clickId = conversionInfo[0];
+          conversion.conversionId = conversionInfo[1];
+          conversion.conversionData = conversionInfo[2];
+          conversions.push(conversion);
+        }
+      }
+
+      if (conversions && conversions.length) {
+        sorted_conversions = conversions
+          .sort((item1, item2) => {
+            return (
+              new Date(item1.clickId * 1000).getTime() -
+              new Date(item2.clickId * 1000).getTime()
+            );
+          })
+          .reverse();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    return sorted_conversions;
+  }
+
   pullPublisherOffers = async () => {
     console.log("Pull Publisher offers");
 
     const { publisherInstance, accounts, web3 } = this.state;
 
     try {
-      const publisherOffers = await publisherInstance.getDeployedPublisherOffers({
-        from: accounts[0]
-      })
+      const publisherOffers = await publisherInstance.getDeployedPublisherOffers(
+        {
+          from: accounts[0]
+        }
+      );
 
       const pubOfferContract = truffleContract(PublisherOfferContract);
-      pubOfferContract.setProvider(web3.currentProvider);      
-      
-      const publisherOfferList = []
+      pubOfferContract.setProvider(web3.currentProvider);
+
+      const publisherOfferList = [];
       let clicksByPublisherOffer = {};
       let conversionsByPublisherOffer = {};
 
@@ -151,10 +342,12 @@ class Publisher extends Component {
         const publisherOfferInstance = await pubOfferContract.at(
           publisherOfferContractAddress
         );
-        const publisherOfferProfile = await publisherOfferInstance.getPublisherOffer({
-          from: accounts[0]
-        });
-        
+        const publisherOfferProfile = await publisherOfferInstance.getPublisherOffer(
+          {
+            from: accounts[0]
+          }
+        );
+
         const publisherProfileHash = publisherOfferProfile[0] || "";
         const ipfsHash = await ipfs.dag.get(publisherProfileHash);
         const profile = ipfsHash.value;
@@ -168,23 +361,22 @@ class Publisher extends Component {
           publisherOfferTargetUrl,
           publisherOfferContractAddress,
           advertiserOfferContractAddress
-        })
+        });
 
-        // const clicks = await this.pullClicks(publisherOfferInstance);
-        // clicksByPublisherOffer[publisherOfferInstance.address] = clicks;
+        const clicks = await this.pullClicks(publisherOfferInstance);
+        clicksByPublisherOffer[publisherOfferInstance.address] = clicks;
 
-        // const conversions = await this.pullConversions(publisherOfferInstance);
-        // conversionsByPublisherOffer[publisherOfferInstance.address] = conversions;
+        const conversions = await this.pullConversions(publisherOfferInstance);
+        conversionsByPublisherOffer[publisherOfferInstance.address] = conversions;
       }
       if (publisherOfferList && publisherOfferList.length) {
-        //this.setState({ publisherOfferList, clicksByPublisherOffer, conversionsByPublisherOffer});
+        this.setState({ publisherOfferList, clicksByPublisherOffer, conversionsByPublisherOffer});
         this.setState({ publisherOfferList });
       }
-
     } catch (error) {
       console.log(error);
     }
-  }
+  };
   pullAdvertiserOffers = async () => {
     const { advertiserFactoryinstance, accounts, web3 } = this.state;
 
@@ -446,6 +638,22 @@ class Publisher extends Component {
     );
   };
 
+  showClicksAndConversions = (row) => {
+    const publisherOfferContractAddress = row.original.publisherOfferContractAddress;
+    const clicks = this.state.clicksByPublisherOffer[publisherOfferContractAddress];
+    const conversions = this.state.conversionsByPublisherOffer[publisherOfferContractAddress];
+    return (
+      <div>
+        <DisplayClicks
+          clicks={clicks}
+        />
+        <DisplayConversions
+          conversions={conversions}
+        />
+      </div>
+    )
+  }
+
   showPublisherOfferList = () => {
     const columns = [
       {
@@ -476,10 +684,42 @@ class Publisher extends Component {
         columns={columns}
         defaultPageSize={5}
         className="-striped -highlight"
-        //SubComponent={this.showClicksAndConversions}
+        SubComponent={this.showClicksAndConversions}
       />
     );
-  }
+  };
+
+  registerClick = async (event) => {
+    window.scrollTo(0, 0);
+    event.preventDefault();
+  
+    if (!this.state.publisherOfferContractAddress) return;
+    if (!this.state.userid) return;
+
+    const { web3, accounts } = this.state;
+    try {
+      const pubOfferContract = truffleContract(PublisherOfferContract);
+      pubOfferContract.setProvider(web3.currentProvider);
+      const publisherOfferInstance = await pubOfferContract.at(
+        this.state.publisherOfferContractAddress
+      );
+
+      let clickid = parseInt(
+        (new Date().getTime() / 1000).toFixed(0),
+        0
+      ).toString();
+
+      this.setState({ message: "Generate Click" });
+
+      await publisherOfferInstance.registerClick(this.state.userid, clickid, {
+        from: accounts[0]
+      });
+
+      this.showPublisherHome();
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   render() {
     if (!this.state.web3) {
@@ -607,6 +847,48 @@ class Publisher extends Component {
         <br />
         <br />
         <hr />
+
+        <div>
+          <h2> Create Click (Test) </h2>
+          <form
+            className="pure-form pure-form-aligned"
+            onSubmit={this.registerClick}
+          >
+            <fieldset>
+              <div className="pure-control-group">
+                <label htmlFor="publisheroffercontractaddress">
+                  Publisher Offer Contract Address
+                </label>
+                <input
+                  id="publisheroffercontractaddress"
+                  type="text"
+                  onChange={event =>
+                    this.setState({
+                      publisherOfferContractAddress: event.target.value
+                    })
+                  }
+                />
+              </div>
+
+              <div className="pure-control-group">
+                <label htmlFor="userid">User Id</label>
+                <input
+                  id="userid"
+                  type="text"
+                  onChange={event =>
+                    this.setState({ userid: event.target.value })
+                  }
+                />
+              </div>
+              <div className="pure-control-group">
+                <input type="submit" />
+              </div>
+            </fieldset>
+          </form>
+        </div>
+
+        <br />
+        <br />
 
         <small>You are using {this.state.accounts[0]} account</small>
       </div>

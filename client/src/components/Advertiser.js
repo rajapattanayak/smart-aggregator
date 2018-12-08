@@ -592,11 +592,6 @@ class Advertiser extends Component {
           {this.showOfferList()}
         </div>
         
-        <div>
-          <h2>Publisher Offer List</h2>
-          {this.showPublisherOfferList()}
-        </div>
-
         <br />
         <br />
         <hr />
