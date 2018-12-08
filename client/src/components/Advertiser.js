@@ -216,8 +216,6 @@ class Advertiser extends Component {
   };
 
   registerAdvertiser = async event => {
-    console.log("Register Advertiser");
-
     event.preventDefault();
 
     const { accounts, advertiserFactoryInstance } = this.state;

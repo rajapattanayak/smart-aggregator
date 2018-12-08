@@ -1,15 +1,15 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import truffleContract from "truffle-contract";
-import ReactTable from 'react-table';
+import ReactTable from "react-table";
 
 import PublisherContract from "../contracts/Publisher.json";
 import PublisherFactoryContract from "../contracts/PublisherFactory.json";
 import PublisherOfferContract from "../contracts/PublisherOffer.json";
 
-import AdvertiserContract from "../contracts/Advertiser.json"
-import AdvertiserFactoryContract from "../contracts/AdvertiserFactory.json"
-import AdvertiserOfferContract from "../contracts/Offer.json"
+import AdvertiserContract from "../contracts/Advertiser.json";
+import AdvertiserFactoryContract from "../contracts/AdvertiserFactory.json";
+import AdvertiserOfferContract from "../contracts/Offer.json";
 
 import getWeb3 from "../utils/getWeb3";
 import ipfs from "../utils/ipfs";
@@ -25,7 +25,7 @@ class PublisherOfferRegistration extends Component {
   };
 
   registerToAdvertiserOffer = async event => {
-    event.preventDefault()
+    event.preventDefault();
     this.props.registerToAdvertiserOffer(
       this.state.advertiserOfferContract,
       this.state.publisherOfferName,
@@ -93,7 +93,7 @@ class Publisher extends Component {
     publisherName: "",
     publisherWebsite: "",
     publisherProfileHash: "",
-    advertiserOfferList:[]
+    advertiserOfferList: []
   };
 
   componentDidMount = async () => {
@@ -101,11 +101,15 @@ class Publisher extends Component {
       const web3 = await getWeb3();
       const accounts = await web3.eth.getAccounts();
 
-      const publisherFactoryContract = truffleContract(PublisherFactoryContract);
+      const publisherFactoryContract = truffleContract(
+        PublisherFactoryContract
+      );
       publisherFactoryContract.setProvider(web3.currentProvider);
       const publisherFactoryInstance = await publisherFactoryContract.deployed();
 
-      const advertiserFactoryContract = truffleContract(AdvertiserFactoryContract);
+      const advertiserFactoryContract = truffleContract(
+        AdvertiserFactoryContract
+      );
       advertiserFactoryContract.setProvider(web3.currentProvider);
       const advertiserFactoryinstance = await advertiserFactoryContract.deployed();
 
@@ -118,13 +122,14 @@ class Publisher extends Component {
 
       this.showPublisherHome();
     } catch (err) {
-      alert(`Failed to load web3, accounts or contract. Check console for details.`);
+      alert(
+        `Failed to load web3, accounts or contract. Check console for details.`
+      );
       console.log(err);
     }
   };
 
   pullAdvertiserOffers = async () => {
-    
     const { advertiserFactoryinstance, accounts, web3 } = this.state;
 
     try {
@@ -149,7 +154,7 @@ class Publisher extends Component {
         const advprofileipfshash = await ipfs.dag.get(advertiserProfileHash);
         const advertiserprofile = advprofileipfshash.value;
         const advertiserName = advertiserprofile.advertiserName;
-          
+
         // Advertiser Offers
         const advertiserOffers = await advertiserInstance.getDeployedOffers({
           from: accounts[0]
@@ -161,16 +166,21 @@ class Publisher extends Component {
           );
 
           if (advertiserOfferInstance) {
-            const advertiserOfferProfile = await advertiserOfferInstance.getProfile({
-              from: this.state.accounts[0]
-            });
+            const advertiserOfferProfile = await advertiserOfferInstance.getProfile(
+              {
+                from: this.state.accounts[0]
+              }
+            );
             const advertiserOfferProfileHash = advertiserOfferProfile[0];
-  
-            const advertiserOfferProfileIpfsHash = await ipfs.dag.get(advertiserOfferProfileHash);
+
+            const advertiserOfferProfileIpfsHash = await ipfs.dag.get(
+              advertiserOfferProfileHash
+            );
             const advertiserOfferprofile = advertiserOfferProfileIpfsHash.value;
             const advertiserOfferName = advertiserOfferprofile.offerName;
-            const advertiserOfferTargetUrl = advertiserOfferprofile.offerTargetUrl;
-  
+            const advertiserOfferTargetUrl =
+              advertiserOfferprofile.offerTargetUrl;
+
             advertiserOfferList.push({
               advertiserName,
               advertiserContractAddress,
@@ -183,7 +193,6 @@ class Publisher extends Component {
       }
       if (advertiserOfferList && advertiserOfferList.length) {
         this.setState({ advertiserOfferList });
-        console.log(this.state.advertiserOfferList);
       }
     } catch (error) {
       console.log(error);
@@ -207,36 +216,42 @@ class Publisher extends Component {
         this.setState({
           publisherName: profile.publisherName,
           publisherWebsite: profile.publisherWebsite
-        })
+        });
       }
 
-      this.setState({ message: '' });
+      this.setState({ message: "" });
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   showPublisherHome = async () => {
     const { accounts, publisherFactoryInstance } = this.state;
 
-    this.setState({ message: 'Pulling Publisher Details.' });
+    this.setState({ message: "Pulling Publisher Details." });
 
     try {
-      const isPublisherRegistered = await publisherFactoryInstance.isPublisherRegistered({
-        from: accounts[0]
-      });
+      const isPublisherRegistered = await publisherFactoryInstance.isPublisherRegistered(
+        {
+          from: accounts[0]
+        }
+      );
 
       if (isPublisherRegistered) {
         this.setState({ isPublisherRegistered });
 
-        const publisherContractAddress = await publisherFactoryInstance.getPublisherByOwner({
-          from: accounts[0]
-        })
+        const publisherContractAddress = await publisherFactoryInstance.getPublisherByOwner(
+          {
+            from: accounts[0]
+          }
+        );
         this.setState({ publisherContractAddress });
 
         const publisherContract = truffleContract(PublisherContract);
         publisherContract.setProvider(this.state.web3.currentProvider);
-        const publisherInstance = await publisherContract.at(publisherContractAddress);
+        const publisherInstance = await publisherContract.at(
+          publisherContractAddress
+        );
 
         this.setState({ publisherInstance });
 
@@ -245,16 +260,14 @@ class Publisher extends Component {
 
         this.setState({ message: "" });
       } else {
-        this.setState({ message: 'New Publisher. Add Profile' });
+        this.setState({ message: "New Publisher. Add Profile" });
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  registerPublisher = async (event) => {
-    console.log('Register Publisher');
-
+  registerPublisher = async event => {
     event.preventDefault();
 
     const { accounts, publisherFactoryInstance } = this.state;
@@ -265,29 +278,32 @@ class Publisher extends Component {
     const publisherProfile = {
       publisherName: this.state.publisherName,
       publisherWebsite: this.state.publisherWebsite
-    }
+    };
 
     try {
-      this.setState({ message: 'Create Publisher profile' });
+      this.setState({ message: "Create Publisher profile" });
 
       const publisherProfileCid = await ipfs.dag.put(publisherProfile, {
         format: "dag-cbor",
         hashAlg: "sha3-512"
-      })
+      });
       const publisherProfileCidStr = publisherProfileCid.toBaseEncodedString();
       this.setState({ publisherProfileHash: publisherProfileCidStr });
 
-      await publisherFactoryInstance.registerPublisher(this.state.publisherProfileHash, {
-        from: accounts[0]
-      })
+      await publisherFactoryInstance.registerPublisher(
+        this.state.publisherProfileHash,
+        {
+          from: accounts[0]
+        }
+      );
 
       this.showPublisherHome();
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
-  registerToAdvertiserOffer = async(
+  registerToAdvertiserOffer = async (
     advertiserOfferContract,
     publisherOfferName,
     publisherTargetUrl
@@ -297,39 +313,41 @@ class Publisher extends Component {
     const publisherOfferData = {
       publisherOfferName: publisherOfferName,
       publisherTargetUrl: publisherTargetUrl
-    }
+    };
 
     try {
       const publisherOfferCid = await ipfs.dag.put(publisherOfferData, {
         format: "dag-cbor",
         hashAlg: "sha3-512"
-      })
+      });
       const publisherofferProfileHash = publisherOfferCid.toBaseEncodedString();
 
-      await publisherInstance.createPublisherOffer(publisherofferProfileHash, advertiserOfferContract, {
-        from: accounts[0]
-      })
+      await publisherInstance.createPublisherOffer(
+        publisherofferProfileHash,
+        advertiserOfferContract,
+        {
+          from: accounts[0]
+        }
+      );
 
       this.showPublisherHome();
-
-    } catch(error) {
+    } catch (error) {
       console.log(error);
     }
+  };
 
-    
-  }
-
-  showOfferRegistrationForm = (row) => {
+  showOfferRegistrationForm = row => {
     const advertiserOfferContract = row.original.advertiserOfferContractAddress;
+
     return (
       <div>
         <PublisherOfferRegistration
-          advertiserOfferContrcat={advertiserOfferContract}
+          advertiserOfferContract={advertiserOfferContract}
           registerToAdvertiserOffer={this.registerToAdvertiserOffer}
         />
       </div>
-    )
-  }
+    );
+  };
 
   showAdvertiserOfferList = () => {
     const columns = [
@@ -369,7 +387,7 @@ class Publisher extends Component {
         SubComponent={this.showOfferRegistrationForm}
       />
     );
-  }
+  };
 
   render() {
     if (!this.state.web3) {
@@ -380,12 +398,18 @@ class Publisher extends Component {
       return (
         <div className="App">
           <div style={{ float: "right" }}>
-            <Link onClick={this.forceUpdate} to={"/advertiser"}> ADVERTISER</Link>
+            <Link onClick={this.forceUpdate} to={"/advertiser"}>
+              {" "}
+              ADVERTISER
+            </Link>
           </div>
 
           <p>{this.state.message}</p>
 
-          <form className="pure-form pure-form-aligned" onSubmit={this.registerPublisher}>
+          <form
+            className="pure-form pure-form-aligned"
+            onSubmit={this.registerPublisher}
+          >
             <h2>Publisher Profile</h2>
 
             <fieldset>
@@ -423,18 +447,24 @@ class Publisher extends Component {
           <br />
           <small> You are using {this.state.accounts[0]} account.</small>
         </div>
-      )
+      );
     }
 
     return (
       <div className="App">
         <div style={{ float: "right" }}>
-          <Link onClick={this.forceUpdate} to={"/advertiser"}> ADVERTISER</Link>
+          <Link onClick={this.forceUpdate} to={"/advertiser"}>
+            {" "}
+            ADVERTISER
+          </Link>
         </div>
 
         <p>{this.state.message}</p>
 
-        <form className="pure-form pure-form-aligned" onSubmit={this.updateProfile} >
+        <form
+          className="pure-form pure-form-aligned"
+          onSubmit={this.updateProfile}
+        >
           <h2>Publisher Profile</h2>
           <em> Contract : {this.state.publisherContractAddress}</em>
 
