@@ -17,6 +17,69 @@ import ipfs from "../utils/ipfs";
 import "../index.css";
 import "../pure-min.css";
 
+class PublisherOfferRegistration extends Component {
+  state = {
+    advertiserOfferContract: this.props.advertiserOfferContract,
+    publisherOfferName: "",
+    publisherTargetUrl: ""
+  };
+
+  registerToAdvertiserOffer = async event => {
+    event.preventDefault()
+    this.props.registerToAdvertiserOffer(
+      this.state.advertiserOfferContract,
+      this.state.publisherOfferName,
+      this.state.publisherTargetUrl
+    );
+  };
+
+  render() {
+    return (
+      <div style={{ padding: "25px" }}>
+        <em style={{ color: "red" }}>Create Publisher Offer</em>
+        <br />
+        <br />
+        <form
+          className="pure-form pure-form-aligned"
+          onSubmit={this.registerToAdvertiserOffer}
+        >
+          <fieldset>
+            <div className="pure-control-group">
+              <label htmlFor="publisheroffername"> Publisher Offer Name </label>
+              <input
+                id="publisheroffername"
+                type="text"
+                onChange={event =>
+                  this.setState({ publisherOfferName: event.target.value })
+                }
+              />
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <div className="pure-control-group">
+              <label htmlFor="targeturl"> Publisher TargetUrl </label>
+              <input
+                id="targeturl"
+                type="text"
+                onChange={event =>
+                  this.setState({ publisherTargetUrl: event.target.value })
+                }
+              />
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <div className="pure-control-group">
+              <input type="submit" />
+            </div>
+          </fieldset>
+        </form>
+      </div>
+    );
+  }
+}
+
 class Publisher extends Component {
   state = {
     message: "",
@@ -26,6 +89,7 @@ class Publisher extends Component {
     advertiserFactoryinstance: null,
     isPublisherRegistered: false,
     publisherContractAddress: "",
+    publisherInstance: null,
     publisherName: "",
     publisherWebsite: "",
     publisherProfileHash: "",
@@ -176,9 +240,10 @@ class Publisher extends Component {
 
         this.setState({ publisherInstance });
 
-        this.pullPublisherProfile();
-        this.pullAdvertiserOffers();
+        await this.pullPublisherProfile();
+        await this.pullAdvertiserOffers();
 
+        this.setState({ message: "" });
       } else {
         this.setState({ message: 'New Publisher. Add Profile' });
       }
@@ -222,7 +287,51 @@ class Publisher extends Component {
     }
   }
 
-  showAdvertiserOfferList = async () => {
+  registerToAdvertiserOffer = async(
+    advertiserOfferContract,
+    publisherOfferName,
+    publisherTargetUrl
+  ) => {
+    const { publisherInstance, accounts } = this.state;
+
+    const publisherOfferData = {
+      publisherOfferName: publisherOfferName,
+      publisherTargetUrl: publisherTargetUrl
+    }
+
+    try {
+      const publisherOfferCid = await ipfs.dag.put(publisherOfferData, {
+        format: "dag-cbor",
+        hashAlg: "sha3-512"
+      })
+      const publisherofferProfileHash = publisherOfferCid.toBaseEncodedString();
+
+      await publisherInstance.createPublisherOffer(publisherofferProfileHash, advertiserOfferContract, {
+        from: accounts[0]
+      })
+
+      this.showPublisherHome();
+
+    } catch(error) {
+      console.log(error);
+    }
+
+    
+  }
+
+  showOfferRegistrationForm = (row) => {
+    const advertiserOfferContract = row.original.advertiserOfferContractAddress;
+    return (
+      <div>
+        <PublisherOfferRegistration
+          advertiserOfferContrcat={advertiserOfferContract}
+          registerToAdvertiserOffer={this.registerToAdvertiserOffer}
+        />
+      </div>
+    )
+  }
+
+  showAdvertiserOfferList = () => {
     const columns = [
       {
         Header: "Advertiser Name",
@@ -257,6 +366,7 @@ class Publisher extends Component {
         columns={columns}
         defaultPageSize={5}
         className="-striped -highlight"
+        SubComponent={this.showOfferRegistrationForm}
       />
     );
   }
@@ -311,7 +421,7 @@ class Publisher extends Component {
             </fieldset>
           </form>
           <br />
-          <p> You are using {this.state.accounts[0]} account.</p>
+          <small> You are using {this.state.accounts[0]} account.</small>
         </div>
       )
     }
@@ -362,12 +472,12 @@ class Publisher extends Component {
         </form>
         <br />
 
-        {/* <div>
+        <div>
           <h2>Advertiser Offer List</h2>
           {this.showAdvertiserOfferList()}
-        </div> */}
+        </div>
 
-        <p>You are using {this.state.accounts[0]} account</p>
+        <small>You are using {this.state.accounts[0]} account</small>
       </div>
     );
   }

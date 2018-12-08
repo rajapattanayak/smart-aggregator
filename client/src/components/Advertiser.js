@@ -208,7 +208,7 @@ class Advertiser extends Component {
         this.pullAdvertiserProfile();
         this.pullOffers();
       } else {
-        this.setState({ message: "Add Profile" });
+        this.setState({ message: "New Advertiser. Add Profile" });
       }
     } catch (error) {
       console.log(error);
@@ -484,7 +484,7 @@ class Advertiser extends Component {
             </fieldset>
           </form>
           <br />
-          <p>You are using {this.state.accounts[0]} account</p>
+          <small>You are using {this.state.accounts[0]} account</small>
         </div>
       );
     }
@@ -655,7 +655,7 @@ class Advertiser extends Component {
         <br />
         <br />
         
-        <p>You are using {this.state.accounts[0]} account</p>
+        <small>You are using {this.state.accounts[0]} account</small>
       </div>
     );
   }
