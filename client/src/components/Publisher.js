@@ -93,7 +93,8 @@ class Publisher extends Component {
     publisherName: "",
     publisherWebsite: "",
     publisherProfileHash: "",
-    advertiserOfferList: []
+    advertiserOfferList: [],
+    publisherOfferList:[]
   };
 
   componentDidMount = async () => {
@@ -129,6 +130,61 @@ class Publisher extends Component {
     }
   };
 
+  pullPublisherOffers = async () => {
+    console.log("Pull Publisher offers");
+
+    const { publisherInstance, accounts, web3 } = this.state;
+
+    try {
+      const publisherOffers = await publisherInstance.getDeployedPublisherOffers({
+        from: accounts[0]
+      })
+
+      const pubOfferContract = truffleContract(PublisherOfferContract);
+      pubOfferContract.setProvider(web3.currentProvider);      
+      
+      const publisherOfferList = []
+      let clicksByPublisherOffer = {};
+      let conversionsByPublisherOffer = {};
+
+      for (const publisherOfferContractAddress of publisherOffers) {
+        const publisherOfferInstance = await pubOfferContract.at(
+          publisherOfferContractAddress
+        );
+        const publisherOfferProfile = await publisherOfferInstance.getPublisherOffer({
+          from: accounts[0]
+        });
+        
+        const publisherProfileHash = publisherOfferProfile[0] || "";
+        const ipfsHash = await ipfs.dag.get(publisherProfileHash);
+        const profile = ipfsHash.value;
+        const publisherOfferName = profile.publisherOfferName;
+        const publisherOfferTargetUrl = profile.publisherTargetUrl;
+
+        const advertiserOfferContractAddress = publisherOfferProfile[3] || "";
+
+        publisherOfferList.push({
+          publisherOfferName,
+          publisherOfferTargetUrl,
+          publisherOfferContractAddress,
+          advertiserOfferContractAddress
+        })
+
+        // const clicks = await this.pullClicks(publisherOfferInstance);
+        // clicksByPublisherOffer[publisherOfferInstance.address] = clicks;
+
+        // const conversions = await this.pullConversions(publisherOfferInstance);
+        // conversionsByPublisherOffer[publisherOfferInstance.address] = conversions;
+      }
+      if (publisherOfferList && publisherOfferList.length) {
+        //this.setState({ publisherOfferList, clicksByPublisherOffer, conversionsByPublisherOffer});
+        this.setState({ publisherOfferList });
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
   pullAdvertiserOffers = async () => {
     const { advertiserFactoryinstance, accounts, web3 } = this.state;
 
@@ -255,8 +311,9 @@ class Publisher extends Component {
 
         this.setState({ publisherInstance });
 
-        await this.pullPublisherProfile();
-        await this.pullAdvertiserOffers();
+        this.pullPublisherProfile();
+        this.pullAdvertiserOffers();
+        this.pullPublisherOffers();
 
         this.setState({ message: "" });
       } else {
@@ -389,6 +446,41 @@ class Publisher extends Component {
     );
   };
 
+  showPublisherOfferList = () => {
+    const columns = [
+      {
+        Header: "Offer Name",
+        accessor: "publisherOfferName",
+        minWidth: 100
+      },
+      {
+        Header: "Target URL",
+        accessor: "publisherOfferTargetUrl",
+        minWidth: 200
+      },
+      {
+        Header: "Publisher Offer Contract",
+        accessor: "publisherOfferContractAddress",
+        minWidth: 300
+      },
+      {
+        Header: "Advertiser Offer Contract",
+        accessor: "advertiserOfferContractAddress",
+        minWidth: 300
+      }
+    ];
+
+    return (
+      <ReactTable
+        data={this.state.publisherOfferList}
+        columns={columns}
+        defaultPageSize={5}
+        className="-striped -highlight"
+        //SubComponent={this.showClicksAndConversions}
+      />
+    );
+  }
+
   render() {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
@@ -506,6 +598,15 @@ class Publisher extends Component {
           <h2>Advertiser Offer List</h2>
           {this.showAdvertiserOfferList()}
         </div>
+
+        <div>
+          <h2>Publisher Offer List</h2>
+          {this.showPublisherOfferList()}
+        </div>
+
+        <br />
+        <br />
+        <hr />
 
         <small>You are using {this.state.accounts[0]} account</small>
       </div>

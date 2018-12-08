@@ -353,6 +353,7 @@ class Advertiser extends Component {
       </div>
     );
   }
+
   showOfferList = () => {
     const columns = [
       {
@@ -589,6 +590,11 @@ class Advertiser extends Component {
         <div>
           <h2>Offer List</h2>
           {this.showOfferList()}
+        </div>
+        
+        <div>
+          <h2>Publisher Offer List</h2>
+          {this.showPublisherOfferList()}
         </div>
 
         <br />
