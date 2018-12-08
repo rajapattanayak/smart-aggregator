@@ -320,8 +320,6 @@ class Publisher extends Component {
   }
 
   pullPublisherOffers = async () => {
-    console.log("Pull Publisher offers");
-
     const { publisherInstance, accounts, web3 } = this.state;
 
     try {
@@ -377,6 +375,7 @@ class Publisher extends Component {
       console.log(error);
     }
   };
+
   pullAdvertiserOffers = async () => {
     const { advertiserFactoryinstance, accounts, web3 } = this.state;
 
@@ -551,6 +550,42 @@ class Publisher extends Component {
       console.log(error);
     }
   };
+
+  updateProfile = async event => {
+    event.preventDefault();
+
+    const { accounts, publisherInstance } = this.state;
+
+    if (!this.state.publisherName) return;
+    if (!this.state.publisherWebsite) return;
+
+    const publisherProfile = {
+      publisherName: this.state.publisherName,
+      publisherWebsite: this.state.publisherWebsite
+    };
+
+    try {
+      this.setState({ message: "Create Publisher profile" });
+
+      const publisherProfileCid = await ipfs.dag.put(publisherProfile, {
+        format: "dag-cbor",
+        hashAlg: "sha3-512"
+      });
+      const publisherProfileCidStr = publisherProfileCid.toBaseEncodedString();
+      this.setState({ publisherProfileHash: publisherProfileCidStr });
+
+      await publisherInstance.updateProfile(
+        this.state.publisherProfileHash,
+        {
+          from: accounts[0]
+        }
+      );
+
+      this.showPublisherHome();
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   registerToAdvertiserOffer = async (
     advertiserOfferContract,
@@ -798,7 +833,17 @@ class Publisher extends Component {
           onSubmit={this.updateProfile}
         >
           <h2>Publisher Profile</h2>
-          <em> Contract : {this.state.publisherContractAddress}</em>
+          <em> Contract Address : </em>
+          <a
+            href={`https://rinkeby.etherscan.io/address/${
+              this.state.publisherContractAddress
+            }`}
+            target="_blank"
+          >
+            {this.state.publisherContractAddress}
+          </a>
+          <br />
+          <br />
 
           <fieldset>
             <div className="pure-control-group">

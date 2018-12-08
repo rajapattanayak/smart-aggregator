@@ -253,7 +253,40 @@ class Advertiser extends Component {
 
   updateProfile = async event => {
     console.log('Update Profile');
-    //todo
+    event.preventDefault();
+
+    const { advertiserInstance } = this.state;
+
+    if (!this.state.advertiserName) return;
+    if (!this.state.advertiserWebsite) return;
+
+    const advertiserprofile = {
+      advertiserName: this.state.advertiserName,
+      advertiserWebsite: this.state.advertiserWebsite
+    };
+
+
+    try {
+      this.setState({ message: "Updating Profile !" });
+
+      const advertiserProfileCid = await ipfs.dag.put(advertiserprofile, {
+        format: "dag-cbor",
+        hashAlg: "sha3-512"
+      });
+      const advertiserProfileCidStr = advertiserProfileCid.toBaseEncodedString();
+      this.setState({ advertiserProfileHash: advertiserProfileCidStr });
+
+      await advertiserInstance.updateProfile(
+        this.state.advertiserProfileHash,
+        {
+          from: this.state.accounts[0]
+        }
+      );
+
+      this.setState({ message: "" });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   createOffer = async event => {
