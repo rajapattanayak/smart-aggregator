@@ -643,7 +643,15 @@ class Publisher extends Component {
       {
         Header: "Offer Contract",
         accessor: "advertiserOfferContractAddress",
-        minWidth: 300
+        minWidth: 300,
+        Cell: props => (
+          <a
+            href={`https://rinkeby.etherscan.io/address/${props.value}`}
+            target="_blank"
+          >
+            {props.value}
+          </a>
+        )
       },
       {
         Header: "Offer Name",
@@ -658,7 +666,15 @@ class Publisher extends Component {
       {
         Header: "Advertiser Contract",
         accessor: "advertiserContractAddress",
-        minWidth: 300
+        minWidth: 300,
+        Cell: props => (
+          <a
+            href={`https://rinkeby.etherscan.io/address/${props.value}`}
+            target="_blank"
+          >
+            {props.value}
+          </a>
+        )
       }
     ];
 
@@ -704,12 +720,28 @@ class Publisher extends Component {
       {
         Header: "Publisher Offer Contract",
         accessor: "publisherOfferContractAddress",
-        minWidth: 300
+        minWidth: 300,
+        Cell: props => (
+          <a
+            href={`https://rinkeby.etherscan.io/address/${props.value}`}
+            target="_blank"
+          >
+            {props.value}
+          </a>
+        )
       },
       {
         Header: "Advertiser Offer Contract",
         accessor: "advertiserOfferContractAddress",
-        minWidth: 300
+        minWidth: 300,
+        Cell: props => (
+          <a
+            href={`https://rinkeby.etherscan.io/address/${props.value}`}
+            target="_blank"
+          >
+            {props.value}
+          </a>
+        )
       }
     ];
 
@@ -785,7 +817,6 @@ class Publisher extends Component {
                 <input
                   id="pubname"
                   type="text"
-                  placeholder="Publisher Name"
                   value={this.state.publisherName}
                   onChange={event => {
                     this.setState({ publisherName: event.target.value });
@@ -798,7 +829,6 @@ class Publisher extends Component {
                 <input
                   id="pubwebsite"
                   type="text"
-                  placeholder="Publisher Website"
                   value={this.state.publisherWebsite}
                   onChange={event => {
                     this.setState({ publisherWebsite: event.target.value });
@@ -851,7 +881,6 @@ class Publisher extends Component {
               <input
                 id="pubname"
                 type="text"
-                placeholder="Publisher Name"
                 value={this.state.publisherName}
                 onChange={event => {
                   this.setState({ publisherName: event.target.value });
@@ -864,7 +893,6 @@ class Publisher extends Component {
               <input
                 id="pubwebsite"
                 type="text"
-                placeholder="Publisher Website"
                 value={this.state.publisherWebsite}
                 onChange={event => {
                   this.setState({ publisherWebsite: event.target.value });

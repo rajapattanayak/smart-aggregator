@@ -366,7 +366,15 @@ class Advertiser extends Component {
           {
             Header: "Contrcat Address",
             accessor: "publisherOfferContractAddress",
-            minWidth: 400
+            minWidth: 400,
+            Cell: props => (
+              <a
+                href={`https://rinkeby.etherscan.io/address/${props.value}`}
+                target="_blank"
+              >
+                {props.value}
+              </a>
+            )
           }
         ]
       }
@@ -402,7 +410,15 @@ class Advertiser extends Component {
       {
         Header: "Offer Contract Address",
         accessor: "offerContractAddress",
-        minWidth: 400
+        minWidth: 400,
+        Cell: props => (
+          <a
+            href={`https://rinkeby.etherscan.io/address/${props.value}`}
+            target="_blank"
+          >
+            {props.value}
+          </a>
+        )
       }
     ];
 
@@ -489,7 +505,6 @@ class Advertiser extends Component {
                 <input
                   id="advname"
                   type="text"
-                  placeholder="Amazon"
                   value={this.state.advertiserName}
                   onChange={event => {
                     this.setState({ advertiserName: event.target.value });
@@ -502,7 +517,6 @@ class Advertiser extends Component {
                 <input
                   id="advwebsite"
                   type="text"
-                  placeholder="amazon.com"
                   value={this.state.advertiserWebsite}
                   onChange={event => {
                     this.setState({ advertiserWebsite: event.target.value });
@@ -554,7 +568,6 @@ class Advertiser extends Component {
               <input
                 id="advname"
                 type="text"
-                placeholder="Amazon"
                 value={this.state.advertiserName}
                 onChange={event => {
                   this.setState({ advertiserName: event.target.value });
@@ -567,7 +580,6 @@ class Advertiser extends Component {
               <input
                 id="advwebsite"
                 type="text"
-                placeholder="amazon.com"
                 value={this.state.advertiserWebsite}
                 onChange={event => {
                   this.setState({ advertiserWebsite: event.target.value });
@@ -594,7 +606,6 @@ class Advertiser extends Component {
               <input
                 id="offerName"
                 type="text"
-                placeholder="Amazon HP Laptop Discount"
                 value={this.state.offerName}
                 onChange={event => {
                   this.setState({ offerName: event.target.value });
@@ -606,7 +617,6 @@ class Advertiser extends Component {
               <input
                 id="offerTargetUrl"
                 type="text"
-                placeholder="amazon.com/laptopdeal"
                 value={this.state.offerTargetUrl}
                 onChange={event => {
                   this.setState({ offerTargetUrl: event.target.value });
@@ -669,7 +679,6 @@ class Advertiser extends Component {
                 <input
                   id="clickid"
                   type="text"
-                  placeholder="Click Id"
                   value={this.state.clickid}
                   onChange={event =>
                     this.setState({ clickid: event.target.value })
