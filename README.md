@@ -62,14 +62,11 @@ See more at http://truffleframework.com/docs
   **truffle compile**
 
 ```
-truffle compile
 Compiling ./contracts/Advertiser.sol...
-Writing artifacts to ./build/contracts
+Compiling ./contracts/Publisher.sol...
+Writing artifacts to ./client/src/contracts
 
 ```
-* Regerate build and client/src/contracts:
-Remove the build folder from src
-run truffle compile
 
 * Migrate Contract to Ganache
 
