@@ -76,21 +76,22 @@ Writing artifacts to ./client/src/contracts
 truffle migrate --reset
 Using network 'development'.
 
-Using network 'development'.
-
 Running migration: 1_initial_migration.js
   Replacing Migrations...
-  ... 0xca999e32abef5941256ed94a993f070ddc67bf3e36d556ff275911401508cebc
-  Migrations: 0x993dcef17c7728463c3a305137d6411dc63a8054
+  ... 0x03c8940b3fe9bf3956ea067b995d7e9cf7cb89ff9124d4c416fc598f5067229a
+  Migrations: 0xc7aacf4a1ae41a3988ae7acd52bf772a5c94285d
 Saving successful migration to network...
-  ... 0x52d6e1db3aa763eac99a57eaa3d5a1022a5183b758674f76b0204ca0e96a225b
+  ... 0x43507196c690c0f359c402c2830460bfda0f6c7e56f07655bed416f2e9663eba
 Saving artifacts...
 Running migration: 2_deploy_contracts.js
   Replacing AdvertiserFactory...
-  ... 0xba7514d9d36c740372f8fe6eb3cdebebb86413de3c8c53e93a7359cfc108defc
-  AdvertiserFactory: 0x10bfdebe5e3535e8002d1cbf38a7c101ea46eda1
+  ... 0xea6b5e2eedad908d7a0466010acebc134ded79fddf4d49cf8ab4359e2dd9b580
+  AdvertiserFactory: 0xf7a942c4143d68c35f8ba75ef447eb06c2ff63aa
+  Replacing PublisherFactory...
+  ... 0xcfd1c0e10c0b95d93de18563c5676a4fd7e6708283b85a415c88561cb5c27f43
+  PublisherFactory: 0xbea049b2084b8247383fd8c292a8601cc22fe99f
 Saving successful migration to network...
-  ... 0xa5ca762d12b1dbf0e0fce35c86e27af05d66ef81b0cad950a2cd5807355b8ffa
+  ... 0x5ac018dcfb58dd25d39aba9a42efb01304750b1485f70466de44ea39576a53de
 Saving artifacts...
 
 ```
@@ -110,19 +111,13 @@ Go inside "client" folder
 Creating an optimized production build...
 Compiled with warnings.
 
-./src/components/Publisher.js
-  Line 2:  'Link' is defined but never used  no-unused-vars
-
-Search for the keywords to learn more about each warning.
-To ignore, add // eslint-disable-next-line to the line before.
-
 File sizes after gzip:
 
-  309.69 KB (+16.89 KB)  build/static/js/1.f9cebc58.chunk.js
-  57.06 KB (+17.24 KB)   build/static/js/main.32dbe04b.chunk.js
-  3.86 KB (+3.73 KB)     build/static/css/main.9f6afadb.chunk.css
-  1.61 KB                build/static/css/1.695e0daf.chunk.css
-  763 B                  build/static/js/runtime~main.229c360f.js
+  416.65 KB  build/static/js/1.500508f5.chunk.js
+  112.27 KB  build/static/js/main.af02dad2.chunk.js
+  4 KB       build/static/css/main.ae258b2e.chunk.css
+  1.61 KB    build/static/css/1.b00b63d5.chunk.css
+  763 B      build/static/js/runtime~main.229c360f.js
 
 The project was built assuming it is hosted at the server root.
 You can control this with the homepage field in your package.json.
