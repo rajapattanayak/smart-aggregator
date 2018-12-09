@@ -136,3 +136,49 @@ Find out more about deployment here:
   http://bit.ly/CRA-deploy
 
 ```
+
+## Flow
+
+### Advertiser creation and Offer creation
+
+```
+Go to localhost:3000/advertiser
+```
+
+* Advertiser Signup
+
+```
+Create a profile for advertiser using MetaMask.
+```
+
+* Offer Creation
+```
+Create an offer with filling up needed information.
+```
+
+### Publisher creation and Offer registration
+
+```
+Go to localhost:3000/publisher
+```
+
+* Publisher Signup
+
+```
+Create a profile for publisher using MetaMask preferably different account from advertisers just for simplicity sake.
+```
+
+* Offer Registration
+```
+Register to an existing offer listed out in the all offers sections, where there will be a collection of offers from all the advertisers.
+```
+
+### Click Generation
+```
+Ideally this click generation has to be organised from Publisher Front-end and Back-end, but for time being and easy demo, we are creating it from the publisher page. Just fill in the details and submit the form.
+```
+
+### Conversion Generation
+```
+Ideally this too has to be done from Advertiser Back-end which for the time being we skipped. Here you will provide the UI with Publisher Contract Address and Click Id which you just generated in the previous step and there you go with the conversion.
+```
