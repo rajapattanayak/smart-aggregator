@@ -151,11 +151,14 @@ Go to localhost:3000/advertiser
 Create a profile for advertiser using MetaMask.
 ```
 ![alt text](https://github.com/rajapattanayak/smart-aggregator/blob/master/flow_images/adv_sign_1.png)
+![alt text](https://github.com/rajapattanayak/smart-aggregator/blob/master/flow_images/adv_sign_2.png)
 
 * Offer Creation
 ```
 Create an offer with filling up needed information.
 ```
+![alt text](https://github.com/rajapattanayak/smart-aggregator/blob/master/flow_images/adv_off_1.png)
+![alt text](https://github.com/rajapattanayak/smart-aggregator/blob/master/flow_images/adv_off_2.png)
 
 ### Publisher creation and Offer registration
 
@@ -169,12 +172,16 @@ Go to localhost:3000/publisher
 Create a profile for publisher using MetaMask preferably different account 
 from advertisers just for simplicity sake.
 ```
+![alt text](https://github.com/rajapattanayak/smart-aggregator/blob/master/flow_images/pub_sign_1.png)
+![alt text](https://github.com/rajapattanayak/smart-aggregator/blob/master/flow_images/pub_sign_2.png)
 
 * Offer Registration
 ```
 Register to an existing offer listed out in the all offers sections, 
 where there will be a collection of offers from all the advertisers.
 ```
+![alt text](https://github.com/rajapattanayak/smart-aggregator/blob/master/flow_images/pub_off_1.png)
+![alt text](https://github.com/rajapattanayak/smart-aggregator/blob/master/flow_images/pub_off_2.png)
 
 ### Click Generation
 ```
@@ -182,6 +189,8 @@ Ideally this click generation has to be organised from Publisher Back-end,
 but for time being and easy demo, we are creating it from the publisher page. 
 Just fill in the details and submit the form.
 ```
+![alt text](https://github.com/rajapattanayak/smart-aggregator/blob/master/flow_images/click_gen_1.png)
+![alt text](https://github.com/rajapattanayak/smart-aggregator/blob/master/flow_images/click_gen_2.png)
 
 ### Conversion Generation
 ```
@@ -190,3 +199,5 @@ time being we skipped. Here you will provide the UI with Publisher Contract Addr
 and Click Id which you just generated in the previous step and there you go 
 with the conversion.
 ```
+![alt text](https://github.com/rajapattanayak/smart-aggregator/blob/master/flow_images/conv_gen_1.png)
+![alt text](https://github.com/rajapattanayak/smart-aggregator/blob/master/flow_images/conv_gen_2.png)
