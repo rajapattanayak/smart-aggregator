@@ -150,7 +150,7 @@ Go to localhost:3000/advertiser
 ```
 Create a profile for advertiser using MetaMask.
 ```
-(https://github.com/rajapattanayak/smart-aggregator/blob/master/flow_images/adv_sign_1.png)
+![alt text](https://github.com/rajapattanayak/smart-aggregator/blob/master/flow_images/adv_sign_1.png)
 
 * Offer Creation
 ```
